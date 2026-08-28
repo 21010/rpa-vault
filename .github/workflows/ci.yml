@@ -42,6 +42,14 @@ jobs:
         run: |
           uv run ruff format --check .
 
-      - name: Run Pytest (excluding integration tests)
+      - name: Run Pyrefly Type Check
         run: |
-          uv run pytest -m "not integration"
+          uv run pyrefly
+
+      - name: Run Bandit (Security Scan)
+        run: |
+          uv run bandit -c pyproject.toml -r src
+
+      - name: Run Pytest with Coverage
+        run: |
+          uv run pytest -m "not integration" --cov=src --cov-report=xml

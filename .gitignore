@@ -51,6 +51,8 @@ cover/
 
 # Environments
 .env
+.env.*
+!.env.example
 .venv
 env/
 venv/
@@ -74,12 +76,8 @@ venv.bak/
 Thumbs.db
 
 # Robocorp
-.pytest_cache/
-.pytest_cache
-.coverage
-.pytest_cache
-.history/*
-.log/*
-.output/*
-.robot_env
-.env
+.robot_env/
+output/
+.output/
+.log/
+.history/
