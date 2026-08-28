@@ -44,7 +44,7 @@ jobs:
 
       - name: Run Pyrefly Type Check
         run: |
-          uv run pyrefly
+          uv run pyrefly check
 
       - name: Run Bandit (Security Scan)
         run: |
