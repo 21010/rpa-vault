@@ -144,6 +144,3 @@ async def test_update_secret_property_not_json(provider):
 async def test_update_secret_property_not_found(provider):
     with pytest.raises(SecretNotFoundError):
         await provider.update_secret_property("missing", "k", "v")
-
-
-

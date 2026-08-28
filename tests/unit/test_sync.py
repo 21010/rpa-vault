@@ -29,7 +29,7 @@ def test_sync_vault_get_secrets(mock_provider):
 
     with SyncVault(mock_provider) as vault:
         secrets = list(vault.get_secrets())
-        
+
     assert len(secrets) == 2
     assert secrets[0].name == "test1"
     assert secrets[1].name == "test2"
@@ -53,6 +53,3 @@ def test_sync_vault_update_secret_property(mock_provider):
     with SyncVault(mock_provider) as vault:
         vault.update_secret_property("test", "key", "val")
     mock_provider.update_secret_property.assert_called_once_with("test", "key", "val")
-
-
-

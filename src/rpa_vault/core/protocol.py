@@ -90,8 +90,6 @@ class VaultProtocol(Protocol):
         """
         ...
 
-
-
     async def close(self) -> None:
         """
         Closes the underlying provider connection and cleans up any resources.

@@ -1,4 +1,3 @@
-
 from pydantic import SecretStr
 
 from rpa_vault.core.models import Secret, SecretDict, SecretList

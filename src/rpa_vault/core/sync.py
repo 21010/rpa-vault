@@ -104,5 +104,3 @@ class SyncVault:
             secret_name (str): The name of the secret to delete.
         """
         self._loop.run_until_complete(self._provider.delete_secret(secret_name))
-
-
