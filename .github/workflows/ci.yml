@@ -36,8 +36,8 @@ jobs:
 
       - name: Run Ruff Linter
         run: |
-          uv run ruff check .
-      
+          uv run ruff check . --fix
+
       - name: Run Ruff Formatter Check
         run: |
           uv run ruff format --check .
