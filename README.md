@@ -39,8 +39,8 @@ pip install rpa-vault
 
 You can integrate `rpa-vault` into various Python environments. 
 
-### 1. Robocorp (or Robot Framework) Bots
-Robocorp bots typically run synchronously. The best way to use `rpa-vault` here is via the `SyncVault` context manager, which completely hides event loop management and safely tears down resources when the block exits.
+### 1. Robocorp and BotCity Bots
+Robocorp and BotCity bots typically run synchronously. The best way to use `rpa-vault` here is via the `SyncVault` context manager, which completely hides event loop management and safely tears down resources when the block exits.
 
 ```python
 from rpa_vault.core.factory import VaultFactory
@@ -127,6 +127,8 @@ except SecretNotFoundError:
 except VaultAuthenticationError as e:
     print(f"Critical Auth Error: {e}")
 ```
+
+> **Note:** For complete, runnable code including FastAPI, BotCity, and Robocorp integrations, check out the [`/examples` directory](./examples/).
 
 ---
 
