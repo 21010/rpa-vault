@@ -4,6 +4,7 @@
 ![Robocorp Compatible](https://img.shields.io/badge/Robocorp-Compatible-ff4f5e)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![CI](https://github.com/21010/rpa-vault/actions/workflows/ci.yml/badge.svg)](https://github.com/21010/rpa-vault/actions/workflows/ci.yml)
 ![Zero Trust](https://img.shields.io/badge/Security-Zero%20Trust-blueviolet)
 ![ISO 27001 Aligned](https://img.shields.io/badge/Compliance-ISO%2027001%20Aligned-success)
 ![100% Secret Masking](https://img.shields.io/badge/Protection-100%25%20Secret%20Masking-critical)
