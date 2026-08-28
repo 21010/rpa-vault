@@ -21,6 +21,20 @@ It provides a unified, highly secure, and purely programmatic CRUD (Create, Read
 
 ---
 
+## Installation
+
+Add `rpa-vault` to your project using your preferred package manager. Since it is designed for modern Python environments, we recommend `uv` or `pip`:
+
+```bash
+uv add rpa-vault
+# or
+pip install rpa-vault
+```
+
+*(Note: If you are installing directly from a Git repository, use `uv add git+https://github.com/21010/rpa-vault.git`)*
+
+---
+
 ## Usage Scenarios
 
 You can integrate `rpa-vault` into various Python environments. 
@@ -67,6 +81,53 @@ uv sync
 uv run python my_bot.py
 ```
 
+### 4. Full Secret Lifecycle (CRUD)
+Because `rpa-vault` provides a pure CRUD interface, managing the full lifecycle of a secret is highly intuitive. Here is a complete example of creating, reading, updating, and deleting a JSON secret:
+
+```python
+import asyncio
+from rpa_vault.core.factory import VaultFactory
+
+async def lifecycle_demo():
+    provider = VaultFactory.get_provider("azure")
+
+    # 1. Create (Set)
+    payload = {"username": "admin", "password": "old_password"}
+    await provider.set_secret("db-credentials", payload)
+
+    # 2. Read (Get)
+    secret = await provider.get_secret("db-credentials")
+    creds = secret.get_value() # Returns a masked SecretDict!
+    print(f"Username: {creds['username']}")
+
+    # 3. Update (Modify property)
+    # Easily rotate a specific key inside the JSON payload without overwriting the rest
+    await provider.update_secret_property("db-credentials", "password", "new_secure_password!")
+
+    # 4. Delete
+    await provider.delete_secret("db-credentials")
+
+    await provider.close()
+
+if __name__ == "__main__":
+    asyncio.run(lifecycle_demo())
+```
+
+### 5. Error Handling
+RPA bots must be resilient. The library catches underlying SDK errors and throws domain-specific exceptions (`SecretNotFoundError`, `VaultAuthenticationError`), allowing you to handle missing configurations gracefully without importing cloud-specific exceptions.
+
+```python
+from rpa_vault.core.exceptions import SecretNotFoundError, VaultAuthenticationError
+
+try:
+    with VaultFactory.get_sync_provider("azure") as vault:
+        optional_config = vault.get_secret("feature-flags")
+except SecretNotFoundError:
+    print("Feature flags not found. Using defaults.")
+except VaultAuthenticationError as e:
+    print(f"Critical Auth Error: {e}")
+```
+
 ---
 
 ## Environment Configuration
@@ -106,6 +167,14 @@ The library uses environment variables for configuration. Because we prioritize 
 3. **Least Privilege & Zero-Trust:** By delegating to `DefaultAzureCredential`, the library avoids handling plain-text credentials for authentication. 
 4. **Dependency Minimalism:** We enforce strict supply-chain security by relying exclusively on official Azure SDKs and `pydantic`. No extraneous CLI parsing or cryptography libraries are included.
 
+### Encryption & Data States
+
+Understanding how your sensitive data is handled at every stage of the pipeline is critical for enterprise compliance:
+
+- **Data at Rest:** `rpa-vault` does **not** store secrets locally on the disk. All secrets are stored securely inside Azure Key Vault, which encrypts data at rest using Microsoft's FIPS 140-2 validated Hardware Security Modules (HSMs).
+- **Data in Transit:** All communication between your bot/machine and the Azure Key Vault is conducted over strictly enforced **TLS 1.2+ (HTTPS)**. The official Azure SDK handles this natively, ensuring no payloads are sent in plaintext.
+- **Data in Memory:** Once the secret is fetched into the Python runtime, it is immediately wrapped in Pydantic `SecretStr` or custom `SecretDict` models. This guarantees that the plain text is obscured (outputting `**********`) if the object is accidentally written to standard output, logs, or caught in an exception traceback. To access the real value in memory, developers must explicitly call `.get_secret_value()` or unpack the dictionary directly where needed.
+
 ---
 
 ## Extending with Custom Providers
@@ -131,3 +200,27 @@ VaultFactory.register("hashicorp", HashiCorpProvider)
 # Use it identically to Azure!
 provider = VaultFactory.get_provider("hashicorp")
 ```
+
+---
+
+## Testing & Local Development
+
+The testing suite is comprehensive and split into two tiers: **Unit Tests** and **Integration Tests**. We use `pytest` and `pytest-asyncio`.
+
+### 1. Unit Tests (Local Mocking)
+Unit tests use `AsyncMock` to completely mock external dependencies and the Azure SDK. They run instantly without network connectivity, making them perfect for CI pipelines.
+
+If you are building your own RPA bot and want to write tests without real Azure credentials, you can mock the `VaultFactory` similarly!
+
+```bash
+uv run pytest tests/unit/
+```
+
+### 2. Integration Tests
+Integration tests run against a real, live backend to ensure the API contracts work in the real world. Because integration tests mutate a real Vault, they are safely skipped by default unless your environment is configured.
+
+```bash
+# Ensure AZURE_VAULT_URL is set in your environment
+uv run pytest -m "integration"
+```
+*(Note: If `AZURE_VAULT_URL` is omitted, Pytest will gracefully skip integration tests instead of failing).*
