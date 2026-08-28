@@ -72,3 +72,14 @@ venv.bak/
 # OS-specific
 .DS_Store
 Thumbs.db
+
+# Robocorp
+.pytest_cache/
+.pytest_cache
+.coverage
+.pytest_cache
+.history/*
+.log/*
+.output/*
+.robot_env
+.env
